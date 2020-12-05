@@ -113,19 +113,9 @@ class ApiController {
      */
     public function getFeedAction(Application $app) {
         $links = $app['dao.link']->findFifteen();
-        $myfile = fopen("rss.xml", "w");
-        $xmlFile = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-        <rss version=\"2.0\"><channel><title>15 Derniers Liens</title>
-        <description>Les 15 dernieres liens ajoutés sur le site de Watson</description>
-        <link>https://www.watson.com</link>";
-        foreach($links as $link){
-            $xmlFile .= "<item><title>".$link->getTitle()."</title>
-            <description>".$link->getDesc()."</description>
-            <link>".$link->getUrl()."</link>
-            <author>".$link->getUser()->getUsername()."</author>";
-        }
-        $xmlFile .= "</channel></rss>";
-        file_put_contents("rss.xml", $xmlFile);
-        return $myfile;
+        $response = new Response($app['twig']->render('feed.xml.twig', array(
+            'links' => $links)));
+        $response->headers->set('Content-Type', 'application/xml; charset=utf-8');
+        return $response;
     }
 }

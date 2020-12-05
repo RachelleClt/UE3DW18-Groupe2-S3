@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Watson</title>
+        <description>Derniers liens publiés</description>
+        <link>http://www.example.org</link>
+        {% for link in links %}
+        <item>
+            <title>{{ link.title }}</title>
+            <description>{{ link.desc }} (par {{ link.user.username }})</description>
+            <link>{{link.url}}</link>
+            {% for tag in link.tags %}
+            <category>{{tag.title}}</category>
+            {% endfor %}
+        </item>
+        {% endfor %}
+    </channel>
+</rss>
