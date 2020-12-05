@@ -108,11 +108,12 @@ class ApiController {
      * 
      * @param Application $app Silex application
      * 
-     * @return xml Associative array whose fields are the link properties.
+     * @return array Associative array whose fields are the link properties.
      *
      */
     private function getFeed(Application $app) {
         $links = $app['dao.link']->findFifteen();
+        $myfile = fopen("rss.xml", "w");
         $xmlFile = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <rss version=\"2.0\"><channel><title>15 Derniers Liens</title>
         <description>Les 15 dernieres liens ajoutés sur le site de Watson</description>
@@ -124,6 +125,7 @@ class ApiController {
             <author>".$link->getUser()."</author>";
         }
         $xmlFile += "</channel></rss>";
-        echo $xmlFile;
+        file_put_contents("rss.xml", $xmlFile);
+        return $myfile;
     }
 }
