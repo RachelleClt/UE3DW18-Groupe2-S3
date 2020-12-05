@@ -4,6 +4,7 @@ namespace Watson\Controller;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Watson\Domain\Link;
 
 class ApiController {
@@ -57,6 +58,9 @@ class ApiController {
         if (!$request->request->has('lien_url')) {
             return $app->json('Missing required parameter: lien_url', 400);
         }
+        if (!$request->request->has('lien_desc')) {
+            return $app->json('Missing required parameter: lien_desc', 400);
+        }
 
         // Build and save the new link
         $link = new Link();
@@ -97,5 +101,29 @@ class ApiController {
             'lien_desc' => $link->getDesc(),
         );
         return $data;
+    }
+
+    /**
+     * Send an XML File of the RSS feed from the last 15 links added
+     * 
+     * @param Application $app Silex application
+     * 
+     * @return xml Associative array whose fields are the link properties.
+     *
+     */
+    private function getFeed(Application $app) {
+        $links = $app['dao.link']->findFifteen();
+        $xmlFile = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+        <rss version=\"2.0\"><channel><title>15 Derniers Liens</title>
+        <description>Les 15 dernieres liens ajoutés sur le site de Watson</description>
+        <link>https://www.watson.com</link>";
+        foreach($links as $link){
+            $xmlFile += "<item><title>".$link->getTitle()."</title>
+            <description>".$link->getDesc()."</description>
+            <link>".$link->getUrl()."</link>
+            <author>".$link->getUser()."</author>";
+        }
+        $xmlFile += "</channel></rss>";
+        echo $xmlFile;
     }
 }
