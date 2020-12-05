@@ -111,7 +111,7 @@ class ApiController {
      * @return array Associative array whose fields are the link properties.
      *
      */
-    private function getFeed(Application $app) {
+    public function getFeedAction(Application $app) {
         $links = $app['dao.link']->findFifteen();
         $myfile = fopen("rss.xml", "w");
         $xmlFile = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -119,12 +119,12 @@ class ApiController {
         <description>Les 15 dernieres liens ajoutés sur le site de Watson</description>
         <link>https://www.watson.com</link>";
         foreach($links as $link){
-            $xmlFile += "<item><title>".$link->getTitle()."</title>
+            $xmlFile .= "<item><title>".$link->getTitle()."</title>
             <description>".$link->getDesc()."</description>
             <link>".$link->getUrl()."</link>
-            <author>".$link->getUser()."</author>";
+            <author>".$link->getUser()->getUsername()."</author>";
         }
-        $xmlFile += "</channel></rss>";
+        $xmlFile .= "</channel></rss>";
         file_put_contents("rss.xml", $xmlFile);
         return $myfile;
     }
